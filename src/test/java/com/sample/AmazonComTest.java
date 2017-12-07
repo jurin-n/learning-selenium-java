@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
@@ -21,7 +22,7 @@ import com.sample.amazon.AmazonSearchResultPage;
 import com.sample.amazon.AmazonTopPage;
 //import org.openqa.selenium.edge.EdgeDriver;
 
-public class SeleniumSampleAppTest {
+public class AmazonComTest {
 	WebDriver driver;
 
 	@Before
@@ -41,8 +42,11 @@ public class SeleniumSampleAppTest {
 		// 最大化
 		// driver.manage().window().maximize();
 
-		// ドライバ起動
-		driver.get("https://www.amazon.co.jp/");
+		// 待機時間設定
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+		// ページ読み込みの待ち時間を設定
+		driver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
 	}
 
 	@After
@@ -52,6 +56,8 @@ public class SeleniumSampleAppTest {
 
 	@Test
 	public void test() throws InterruptedException, IOException {
+		// トップページ表示
+		driver.get("https://www.amazon.co.jp/");
 		AmazonTopPage topPage = new AmazonTopPage(driver);
 		List<WebElement> scriptElemets = topPage.getScriptTags();
 		System.out.println("[DEBUG]JavaScript URLs ");
@@ -63,6 +69,8 @@ public class SeleniumSampleAppTest {
 		for (WebElement e : styleElemets) {
 			System.out.println(e.getAttribute("href"));
 		}
+
+		// 検索
 		AmazonSearchResultPage resultPage = topPage.search("AWS実践");
 
 		String testResultBase = System.getProperty("user.dir") + File.separator + "result" + File.separator;
